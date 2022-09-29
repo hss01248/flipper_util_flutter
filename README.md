@@ -1,15 +1,24 @@
 # flipper_util
 
-A new Flutter plugin project.
+flutter plugin for [flipperUtil](https://github.com/hss01248/flipperUtil)
+
+* Dio interceptor : report http info to flipper client  in android
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
+## dio interceptor
+
+```dart
+ Dio dio = Dio();
+//add the FlipperKitDioInterceptor as the last interceptor
+dio.interceptors.add(FlipperKitDioInterceptor(topRouter: (){
+  //return the top router name ,it will display in request headers
+    return "page/topTest";
+  }))
+```
+
+
+
+![image-20220929143528503](https://cdn.jsdelivr.net/gh/shuiniuhss/myimages@main/imagemac2/1664433328558-image-20220929143528503.jpg)

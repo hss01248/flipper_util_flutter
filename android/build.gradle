@@ -2,6 +2,7 @@ group 'com.hss01248.flipper_util'
 version '1.0'
 
 buildscript {
+
     repositories {
         google()
         mavenCentral()
@@ -32,4 +33,7 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+}
+dependencies{
+ api "com.github.hss01248.HttpUtil2:logforaop:3.1.2"
 }

@@ -43,6 +43,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -56,4 +57,14 @@ android {
 
 flutter {
     source '../..'
+}
+
+
+repositories {
+    mavenLocal()
+}
+
+dependencies {
+    api 'com.github.hss01248.flipperUtil:flipper:1.6.11-dev.local'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
