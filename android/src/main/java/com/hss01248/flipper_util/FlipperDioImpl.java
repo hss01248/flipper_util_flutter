@@ -19,8 +19,8 @@ public class FlipperDioImpl implements FlipperPigeon.FlipperDioApi{
             clazz.getMethod("reportRequest",String.class,Long.class,String.class,String.class,Map.class,String.class)
                     .invoke(clazz,requestId,timeStamp,uri,method,headers,body);
         }catch (Throwable throwable){
-            throwable.printStackTrace();
-            Log.w("flipperdio","com.hss01248.flipper.http.FlutterDioApi not found");
+            //throwable.printStackTrace();
+            Log.v("flipperdio","com.hss01248.flipper.http.FlutterDioApi not found");
         }
 
     }
@@ -33,8 +33,8 @@ public class FlipperDioImpl implements FlipperPigeon.FlipperDioApi{
             clazz.getMethod("reportResponse",String.class,Long.class,Long.class,String.class,Map.class,String.class)
                     .invoke(clazz,requestId,timeStamp,statusCode,statusReason,headers,body);
         }catch (Throwable throwable){
-            throwable.printStackTrace();
-            Log.w("flipperdio","com.hss01248.flipper.http.FlutterDioApi not found");
+            //throwable.printStackTrace();
+            Log.v("flipperdio","com.hss01248.flipper.http.FlutterDioApi not found");
         }
     }
 }

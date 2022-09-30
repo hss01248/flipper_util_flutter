@@ -5,7 +5,7 @@ import 'dart:core';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-
+import 'dart:convert';
 import 'api_generated.dart';
 
 typedef TopRouter = String Function();
@@ -50,27 +50,40 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
   void _reportRequest(RequestOptions options) {
     var uniqueId = _uuid.v4();
 
-    options.extra.putIfAbsent('__uniqueId__', () => uniqueId);
-    String body = buildRequestBodyStr(options);
+    //options.extra.putIfAbsent(key, () => uniqueId);
+    if(options.extra == null){
+      options.extra = {};
+    }
+    options.extra[key] =  uniqueId;
+   // debugPrint("options.extra.toString(): "+options.extra.toString());
+
 
     Map<String,String> headers = {};
     //response.headers.map,
     options.headers.forEach((key, value) {
       headers[key] = value.toString();
     });
-    headers["from-flutter"] = "1";
+    String body = buildRequestBodyStr(options,headers);
+    //headers["from-flutter"] = "1";
     headers["flutter-top-router"] = topRouter?.call()??"unSetTopRouterFunction";
 
 
 
-    _flipperNetworkPlugin.reportRequest(uniqueId,DateTime.now().millisecondsSinceEpoch,
-        '${options.baseUrl}${options.path}',options.method,headers,body);
+    try{
+      _flipperNetworkPlugin.reportRequest(uniqueId??"",DateTime.now().millisecondsSinceEpoch,
+          '${options.baseUrl}${options.path}',options.method,headers,body);
+    }catch(e,s){
+      debugPrint(e.toString()+"\n"+s.toString());
+    }
   }
 
+  static String key = "__uniqueId_flipper__";
   void _reportResponse(Response response) {
-    var uniqueId = response.requestOptions.extra['__uniqueId__'];
+    var uniqueId = response.requestOptions.extra[key];
+   // debugPrint("response.requestOptions.extra.toString(): "+response.requestOptions.extra.toString());
+    //debugPrint("response id:"+ uniqueId.toString());
 
-    String body = buildResponseStr(response);
+
 
     Map<String,String> headers = {};
     //response.headers.map,
@@ -90,15 +103,25 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
         }
         headers[key] = headerVals;
       }
-
     });
+    String body = buildResponseStr(response,headers);
+    //处理cookie:
+    if(response.requestOptions.headers["cookie"] != null){
+      headers["cookies_from_request"] = response.requestOptions.headers["cookie"];
+    }
+
+    try{
+      //uniqueId 为空问题
+      _flipperNetworkPlugin.reportResponse(uniqueId??"",DateTime.now().millisecondsSinceEpoch,
+          response.statusCode??-1,response.statusMessage??"unknown",headers,body);
+    }catch(e,s){
+      debugPrint(e.toString()+"\n"+s.toString());
+    }
 
 
-    _flipperNetworkPlugin.reportResponse(uniqueId,DateTime.now().millisecondsSinceEpoch,
-        response.statusCode??-1,response.statusMessage??"unknown",headers,body);
   }
 
-  String buildRequestBodyStr(RequestOptions options) {
+  String buildRequestBodyStr(RequestOptions options,Map<String,String> headers) {
     String? contentType = contentType2(options.headers);
     if(isStr(contentType)){
       dynamic data =  options.data;
@@ -107,16 +130,18 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
         return "body null";
       }
       if(data is Map){
-        return data.toString();
+        return json.encode(data);
+      }else if(data is List){
+        return json.encode(data);
       }
       return data.toString();
     }
-    options.headers["content-type-real"] = contentType.toString();
-    options.headers["content-type"] = ["text/plain"];
+    headers["content-type-real"] = contentType.toString();
+    headers["content-type"] = "text/plain";
     return "request body not text-> "+contentType.toString();
   }
 
-  String buildResponseStr(Response<dynamic> response) {
+  String buildResponseStr(Response<dynamic> response,Map<String,String> headers) {
     String? contentType = contentType2(response.headers.map);
     if(isStr(contentType)){
       dynamic data =  response.data;
@@ -125,12 +150,14 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
         return "response null";
       }
       if(data is Map){
-        return data.toString();
+        return json.encode(data);
+      }else if(data is List){
+        return json.encode(data);
       }
       return data.toString();
     }
-    response.headers.map["content-type-real"] = [contentType.toString().replaceAll("[", "").replaceAll("]", "")];
-    response.headers.map["content-type"] = ["text/plain"];
+    headers["content-type-real"] = contentType.toString().replaceAll("[", "").replaceAll("]", "");
+    headers["content-type"] = "text/plain";
 
     return "not text--> "+ contentType.toString();
   }
@@ -158,7 +185,7 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
       type = headers["content-Type"].toString();
     }
 
-    debugPrint("content type: "+ type);
+    //debugPrint("content type: "+ type);
     return type;
   }
 }
