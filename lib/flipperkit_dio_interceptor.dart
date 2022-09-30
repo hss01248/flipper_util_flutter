@@ -47,7 +47,7 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
     handler.next(err);
   }
 
-  void _reportRequest(RequestOptions options) {
+  Future<void> _reportRequest(RequestOptions options) async {
     var uniqueId = _uuid.v4();
 
     //options.extra.putIfAbsent(key, () => uniqueId);
@@ -67,23 +67,20 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
     //headers["from-flutter"] = "1";
     headers["flutter-top-router"] = topRouter?.call()??"unSetTopRouterFunction";
 
-
-
     try{
-      _flipperNetworkPlugin.reportRequest(uniqueId??"",DateTime.now().millisecondsSinceEpoch,
+    await  _flipperNetworkPlugin.reportRequest(uniqueId,DateTime.now().millisecondsSinceEpoch,
           '${options.baseUrl}${options.path}',options.method,headers,body);
     }catch(e,s){
-      debugPrint(e.toString()+"\n"+s.toString());
+      debugPrint("print by dio-flutter: reportRequest--> "+e.toString());
+      //+s.toString()
     }
   }
 
   static String key = "__uniqueId_flipper__";
-  void _reportResponse(Response response) {
+  Future<void> _reportResponse(Response response) async {
     var uniqueId = response.requestOptions.extra[key];
    // debugPrint("response.requestOptions.extra.toString(): "+response.requestOptions.extra.toString());
     //debugPrint("response id:"+ uniqueId.toString());
-
-
 
     Map<String,String> headers = {};
     //response.headers.map,
@@ -112,10 +109,11 @@ class FlipperKitDioInterceptor extends InterceptorsWrapper {
 
     try{
       //uniqueId 为空问题
-      _flipperNetworkPlugin.reportResponse(uniqueId??"",DateTime.now().millisecondsSinceEpoch,
+      await _flipperNetworkPlugin.reportResponse(uniqueId??"",DateTime.now().millisecondsSinceEpoch,
           response.statusCode??-1,response.statusMessage??"unknown",headers,body);
     }catch(e,s){
-      debugPrint(e.toString()+"\n"+s.toString());
+      debugPrint("print by dio-flutter: reportResponse--> "+ e.toString());
+      //+s.toString()
     }
 
 

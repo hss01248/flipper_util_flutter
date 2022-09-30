@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion = await _flipperUtilPlugin.getPlatformVersion() ??
+      platformVersion =
           'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Expanded(
+
             child: Column(
               children: [
                 ElevatedButton(
@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('发put请求-上传图片')),
               ],
-            ),
+
           ),
         ),
       ),
