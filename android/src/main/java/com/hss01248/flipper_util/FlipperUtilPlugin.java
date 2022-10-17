@@ -2,8 +2,6 @@ package com.hss01248.flipper_util;
 
 import androidx.annotation.NonNull;
 
-import com.hss01248.logforaop.LogProxy;
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -23,7 +21,7 @@ public class FlipperUtilPlugin implements FlutterPlugin, MethodCallHandler {
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flipper_util");
     channel.setMethodCallHandler(this);
     FlipperPigeon.FlipperDioApi.setup(flutterPluginBinding.getFlutterEngine().getDartExecutor().getBinaryMessenger(),
-            LogProxy.getProxy(new FlipperDioImpl()));
+            new FlipperDioImpl());
   }
 
   @Override
